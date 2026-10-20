@@ -1,0 +1,575 @@
+{% extends "base.html" %}
+
+{% block title %}学生管理 - CodeMate{% endblock %}
+
+{% block header_title %}学生管理{% endblock %}
+{% block header_subtitle %}管理班级和学生信息{% endblock %}
+
+{% block head %}
+<style>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 28px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f1f5f9;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #1e293b;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #64748b;
+            transition: color 0.2s ease;
+            line-height: 1;
+            font-weight: 300;
+        }
+
+        .close-modal:hover {
+            color: #1e293b;
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-submitted {
+            background: rgba(22, 163, 74, 0.1);
+            color: #16a34a;
+        }
+
+        .status-scored {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+        }
+
+        .status-not-submitted {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            
+
+            
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+        
+            <div class="user-info">
+                <div class="user-avatar">{{ display_name[0] }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">学生列表</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="location.href='/teacher/classes'">
+                        班级管理
+                    </button>
+                    <button class="btn btn-success" onclick="showAddModal()">
+                        添加学生
+                    </button>
+                </div>
+            </div>
+
+            {% if students %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学号 (登录账号)</th>
+                            <th>姓名</th>
+                            <th>所属班级</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.id }}</td>
+                            <td>{{ student.display_name }}</td>
+                            <td>
+                                {% if student_class_map[student.id] %}
+                                    {% for cls in student_class_map[student.id] %}
+                                        <span style="display: inline-block; background: #f1f5f9; padding: 4px 10px; border-radius
+: 4px; font-size: 12px; margin-right: 4px; margin-bottom: 4px;">
+                                            {{ cls.name }}
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span style="color: #64748b; font-size: 13px;">未分配</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="viewStudent({{ student.id }})">
+                                    详情
+                                </button>
+                                <button class="btn btn-danger btn-sm" style="margin-left: 8px;" onclick="confirmDelete({{ student
+.id }})">
+                                    删除
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>暂无学生</p>
+                <p style="font-size: 14px; margin-top: 8px;">点击上方按钮添加学生</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- 添加学生弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAddModal()">&times;</span>
+            <h3>添加学生</h3>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label for="newDisplayName">姓名/昵称</label>
+                    <input type="text" id="newDisplayName" placeholder="请输入姓名或昵称" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">密码</label>
+                    <input type="password" id="newPassword" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 8px;">
+                    添加学生
+                </button>
+                <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 8px; background: #f1f5f9; color: #1
+e293b;" onclick="closeAddModal()">
+                    取消
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 学生详情弹窗 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+            <h3 id="studentName">学生详情</h3>
+            <div id="studentDetails"></div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeDetailModal()">
+                关闭
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let hasClassesModified = false;
+
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+            document.getElementById('newDisplayName').focus();
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('addStudentForm').reset();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            if (hasClassesModified) {
+                location.reload();
+            }
+        }
+
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const display_name = document.getElementById('newDisplayName').value;
+            const password = document.getElementById('newPassword').value;
+
+            fetch('/teacher/add_student', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ display_name, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('学生添加成功');
+                    closeAddModal();
+                    location.reload();
+                } else {
+                    alert('添加失败: ' + data.error);
+                }
+            });
+        });
+
+        function viewStudent(id, isUpdate = false) {
+            if (!isUpdate) {
+                hasClassesModified = false;
+            }
+            fetch('/teacher/student/' + id)
+            .then(res => res.json())
+            .then(data => {
+                let details = `<p style="margin-bottom: 8px;"><strong>学号(登录账号):</strong> ${data.id}</p>`;
+                details += `<p style="margin-bottom: 20px;"><strong>姓名:</strong> ${data.display_name}</p>`;
+                
+                // 班级管理
+                details += `<h4 style="margin-bottom: 12px; color: #1e293b; font-size: 16px; font-weight: 600;">班级管理</h4>`;
+                details += `<div style="margin-bottom: 16px;">`;
+                details += `<p style="font-size: 14px; color: #64748b; margin-bottom: 8px;"><strong>已加入的班级:</strong></p>`;
+                if (data.classes.length > 0) {
+                    details += `<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">`;
+                    data.classes.forEach(c => {
+                        details += `<span style="background: #f1f5f9; padding: 6px 12px; border-radius: 6px; font-size: 13px; dis
+play: inline-flex; align-items: center; gap: 6px;">
+                            ${c.name}
+                            <button onclick="removeClassFromStudent(${data.id}, ${c.id})" style="background: none; border: none; 
+color: #dc2626; cursor: pointer; font-size: 16px; padding: 0; line-height: 1;">&times;</button>
+                        </span>`;
+                    });
+                    details += `</div>`;
+                } else {
+                    details += `<p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">未加入任何班级</p>`;
+                }
+                
+                if (data.available_classes.length > 0) {
+                    details += `<p style="font-size: 14px; color: #64748b; margin-bottom: 8px;"><strong>可加入的班级:</strong></p
+>`;
+                    details += `<div style="display: flex; flex-wrap: wrap; gap: 8px;">`;
+                    data.available_classes.forEach(c => {
+                        details += `<button onclick="addClassToStudent(${data.id}, ${c.id})" style="background: #2563eb; color: w
+hite; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;">
+                            + ${c.name}
+                        </button>`;
+                    });
+                    details += `</div>`;
+                }
+                details += `</div>`;
+                
+                details += `<h4 style="margin-bottom: 12px; color: #1e293b; font-size: 16px; font-weight: 600;">作业提交情况</h4>
+`;
+
+                if (data.assignments.length > 0) {
+                    details += `<div style="border-radius: 8px; overflow: hidden;">`;
+                    details += `<table style="width:100%; border-collapse: collapse;"><thead><tr><th style="background: #f1f5f9; 
+padding: 10px 12px; text-align: left; font-size: 13px; color: #64748b;">作业</th><th style="background: #f1f5f9; padding: 10px 12
+px; text-align: left; font-size: 13px; color: #64748b;">状态</th><th style="background: #f1f5f9; padding: 10px 12px; text-align: 
+left; font-size: 13px; color: #64748b;">成绩</th></tr></thead><tbody>`;
+                    data.assignments.forEach(a => {
+                        let statusClass = 'status-not-submitted';
+                        let statusText = '未提交';
+                        if (a.submitted) {
+                            if (a.scored) {
+                                statusClass = 'status-scored';
+                                statusText = '已批改';
+                            } else {
+                                statusClass = 'status-submitted';
+                                statusText = '已提交';
+                            }
+                        }
+                        details += `<tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 10px 12px; font-size: 14px;
+">${a.title}</td><td style="padding: 10px 12px;"><span class="status-badge ${statusClass}">${statusText}</span></td><td style="pa
+dding: 10px 12px; font-size: 14px;">${a.score || '-'}</td></tr>`;
+                    });
+                    details += `</tbody></table></div>`;
+                } else {
+                    details += `<p style="color: #64748b;">暂无作业记录</p>`;
+                }
+
+                document.getElementById('studentName').textContent = `${data.display_name || data.username} 的详情`;
+                document.getElementById('studentDetails').innerHTML = details;
+                document.getElementById('detailModal').style.display = 'flex';
+            });
+        }
+
+        function addClassToStudent(studentId, classId) {
+            fetch(`/teacher/student/${studentId}/add_class`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class_id: classId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    hasClassesModified = true;
+                    viewStudent(studentId, true);
+                } else {
+                    alert('添加失败: ' + data.error);
+                }
+            });
+        }
+
+        function removeClassFromStudent(studentId, classId) {
+            fetch(`/teacher/student/${studentId}/remove_class`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class_id: classId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    hasClassesModified = true;
+                    viewStudent(studentId, true);
+                } else {
+                    alert('移除失败: ' + data.error);
+                }
+            });
+        }
+
+        function confirmDelete(id) {
+            if (confirm('确定要删除这个学生吗？此操作不可撤销。')) {
+                fetch('/teacher/delete_student/' + id, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('删除失败: ' + data.error);
+                    }
+                });
+            }
+        }
+
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('addModal')) {
+                closeAddModal();
+            }
+            if (e.target == document.getElementById('detailModal')) {
+                closeDetailModal();
+            }
+        }
+    </script>
+</body>
+</html>
+(base) xxn@hzcu-hpct:~/agent$ 

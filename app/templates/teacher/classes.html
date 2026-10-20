@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}班级管理 - CodeMate{% endblock %}
+
+{% block header_title %}班级列表{% endblock %}
+{% block header_subtitle %}管理教学班级和学生结构{% endblock %}
+
+{% block head %}
+<style>
+    .card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        padding: 28px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-danger {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-sm {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    .class-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .class-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        transition: all 0.2s ease;
+    }
+
+    .class-card:hover {
+        border-color: #2563eb;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .class-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .class-description {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 16px;
+        min-height: 42px;
+    }
+
+    .class-meta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .class-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #64748b;
+    }
+
+    .empty-state p {
+        font-size: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">班级列表</h3>
+        <button class="btn btn-primary" onclick="location.href='/teacher/class/create'">
+            创建班级
+        </button>
+    </div>
+
+    {% if classes %}
+    <div class="class-grid">
+        {% for cls in classes %}
+        <div class="class-card">
+            <div class="class-name">{{ cls.name }}</div>
+            <div class="class-description">{{ cls.description or '暂无描述' }}</div>
+            <div class="class-meta">
+                <div class="meta-item">
+                    <span id="student-count-{{ cls.id }}">加载中...</span>
+                </div>
+            </div>
+            <div class="class-actions">
+                <button class="btn btn-secondary btn-sm" onclick="location.href='/teacher/class/{{ cls.id }}/students'">
+                    管理学生
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="location.href='/teacher/class/edit/{{ cls.id }}'">
+                    编辑
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ cls.id }})">
+                    删除
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无班级</p>
+        <p style="font-size: 14px; margin-top: 8px;">点击上方按钮创建班级</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% for cls in classes %}
+    fetch('/teacher/class/{{ cls.id }}/students')
+    .then(res => res.text())
+    .then(html => {
+        const count = (html.match(/class-student-item/g) || []).length;
+        const availableCount = (html.match(/available-student-item/g) || []).length;
+        document.getElementById('student-count-{{ cls.id }}').textContent = count + ' 名学生';
+    });
+    {% endfor %}
+
+    function confirmDelete(id) {
+        if (confirm('确定要删除这个班级吗？此操作不可撤销。')) {
+            fetch('/teacher/class/delete/' + id, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('删除失败: ' + data.error);
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

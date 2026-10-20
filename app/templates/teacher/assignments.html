@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}作业管理 - CodeMate{% endblock %}
+
+{% block header_title %}作业管理{% endblock %}
+{% block header_subtitle %}发布和管理编程作业{% endblock %}
+
+{% block head %}
+<style>
+    .card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-edit {
+        background: #16a34a;
+        color: white;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .btn-edit:hover {
+        background: #15803d;
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-delete {
+        background: #dc2626;
+        color: white;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .btn-delete:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #f1f5f9;
+        font-weight: 600;
+        color: #64748b;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    td {
+        color: #1e293b;
+        font-size: 14px;
+    }
+
+    tr:hover {
+        background: #f1f5f9;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #64748b;
+    }
+
+    .empty-state p {
+        font-size: 15px;
+    }
+
+    .deadline-badge {
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .deadline-urgent {
+        background: rgba(220, 38, 38, 0.1);
+        color: #dc2626;
+    }
+
+    .deadline-normal {
+        background: rgba(22, 163, 74, 0.1);
+        color: #16a34a;
+    }
+
+    .actions {
+        display: flex;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">作业列表</h3>
+        <button class="btn btn-primary" onclick="location.href='/teacher/assignment/new'">
+            创建新作业
+        </button>
+    </div>
+
+    {% if assignments %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>作业标题</th>
+                    <th>所属班级</th>
+                    <th>截止时间</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.title }}</td>
+                    <td>
+                        {% if assignment.class_id %}
+                            {{ class_map.get(assignment.class_id, '未知班级') }}
+                        {% else %}
+                            <span style="color: #64748b;">所有班级</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="deadline-badge {% if assignment.is_deadline_urgent() %}deadline-urgent{% else %}deadline-normal{% endif %}">
+                            {{ assignment.get_deadline_str() }}
+                        </span>
+                    </td>
+                    <td>{{ assignment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-edit" onclick="location.href='/teacher/assignment/edit/{{ assignment.id }}'">编辑</button>
+                            <button class="btn btn-delete" onclick="confirmDelete({{ assignment.id }})">删除</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无作业，请创建新作业</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmDelete(id) {
+        if (confirm('确定要删除这个作业吗？此操作不可撤销。')) {
+            fetch('/teacher/assignment/' + id + '/delete', {
+                method: 'POST'
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                window.location.reload();
+            });
+        }
+    }
+</script>
+{% endblock %}

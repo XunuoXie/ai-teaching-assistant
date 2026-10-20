@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}教师控制台 - CodeMate{% endblock %}
+
+{% block header_title %}欢迎回来，{{ display_name }}{% endblock %}
+{% block header_subtitle %}这是你的教学管理控制台{% endblock %}
+
+{% block head %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid var(--border);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .stat-icon.blue { background: rgba(37, 99, 235, 0.1); color: var(--primary); }
+    .stat-icon.green { background: rgba(22, 163, 74, 0.1); color: var(--success); }
+    .stat-icon.orange { background: rgba(217, 119, 6, 0.1); color: var(--warning); }
+    .stat-icon.purple { background: rgba(124, 58, 237, 0.1); color: #7c3aed; }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .quick-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">HW</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ total_assignments }}</div>
+            <div class="stat-label">作业数量</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">ST</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">学生人数</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">PD</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ unscored_submissions }}</div>
+            <div class="stat-label">待批改</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">CP</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ scored_submissions }}</div>
+            <div class="stat-label">已完成</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">快速操作</h3>
+    </div>
+    <div class="quick-actions">
+        <button class="btn btn-primary" onclick="location.href='/teacher/assignment/new'">
+            + 创建新作业
+        </button>
+        <button class="btn btn-outline" style="background: white;" onclick="location.href='/teacher/submissions'">
+            查看作业提交
+        </button>
+        <button class="btn btn-outline" style="background: white;" onclick="location.href='/teacher/students'">
+            添加学生
+        </button>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+
+flask
+flask-sqlalchemy
+werkzeug
+requests
+matplotlib
+numpy
+pillow
+flask-cors
+pyjwt
+python-dotenv

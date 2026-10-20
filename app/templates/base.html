@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}智慧教学平台{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/theme.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">AI</div>
+                <div class="logo-text">智慧教学平台</div>
+            </div>
+            <div class="sidebar-subtitle">编程学习管理系统</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            {% if session.get('user_id') %}
+                {% set user = User.query.get(session['user_id']) %}
+                {% if user.role == 'teacher' or user.role == 'admin' %}
+                    <a href="/teacher/dashboard" class="nav-item {% if request.path == '/teacher/dashboard' %}active{% endif %}">
+                        <span class="nav-icon">📊</span>
+                        <span>控制台</span>
+                    </a>
+                    <a href="/teacher/classes" class="nav-item {% if '/teacher/classes' in request.path %}active{% endif %}">
+                        <span class="nav-icon">🏫</span>
+                        <span>班级管理</span>
+                    </a>
+                    <a href="/teacher/assignments" class="nav-item {% if '/teacher/assignments' in request.path %}active{% endif %}">
+                        <span class="nav-icon">📝</span>
+                        <span>作业管理</span>
+                    </a>
+                    <a href="/teacher/students" class="nav-item {% if '/teacher/students' in request.path %}active{% endif %}">
+                        <span class="nav-icon">👥</span>
+                        <span>学生管理</span>
+                    </a>
+                    <a href="/teacher/submissions" class="nav-item {% if '/teacher/submissions' in request.path %}active{% endif %}">
+                        <span class="nav-icon">📋</span>
+                        <span>提交管理</span>
+                    </a>
+                    <a href="/chat" class="nav-item {% if request.path == '/chat' %}active{% endif %}">
+                        <span class="nav-icon">💬</span>
+                        <span>AI 辅导</span>
+                    </a>
+                {% else %}
+                    <a href="/student/dashboard" class="nav-item {% if request.path == '/student/dashboard' %}active{% endif %}">
+                        <span class="nav-icon">📊</span>
+                        <span>我的作业</span>
+                    </a>
+                    <a href="/chat" class="nav-item {% if request.path == '/chat' %}active{% endif %}">
+                        <span class="nav-icon">💬</span>
+                        <span>AI 辅导</span>
+                    </a>
+                {% endif %}
+                
+                <div style="flex: 1;"></div>
+                
+                <a href="/profile" class="nav-item {% if request.path == '/profile' %}active{% endif %}">
+                    <span class="nav-icon">👤</span>
+                    <span>个人资料</span>
+                </a>
+                <a href="/logout" class="nav-item">
+                    <span class="nav-icon">🚪</span>
+                    <span>退出登录</span>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="welcome">
+                <h1 class="welcome-title">{% block header_title %}欢迎{% endblock %}</h1>
+                <p class="welcome-subtitle">{% block header_subtitle %}{% endblock %}</p>
+            </div>
+            {% if session.get('user_id') %}
+                {% set user = User.query.get(session['user_id']) %}
+                <div class="user-info">
+                    <div class="user-avatar">{{ user.display_name[0] if user.display_name else 'U' }}</div>
+                </div>
+            {% endif %}
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

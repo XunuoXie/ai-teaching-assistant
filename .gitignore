@@ -1,0 +1,63 @@
+# ---------- 敏感信息 ----------
+.env
+.env.local
+.env.*.local
+passwd.md
+cookies*.txt
+**/cookies*.txt
+*.pem
+*.key
+
+# ---------- 本地工具配置 ----------
+.claude/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+*.egg-info/
+build/
+
+# ---------- Node / 前端 ----------
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 数据库 ----------
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# ---------- 运行时产物 ----------
+static/outputs/
+sandbox_temp/
+*.log
+logs/
+flask_run.log
+flask_test.log
+
+# ---------- 历史备份 / 临时文件 ----------
+app.old.py
+README_VUE.md
+circle_animation.gif
+
+# ---------- IDE / 编辑器 ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

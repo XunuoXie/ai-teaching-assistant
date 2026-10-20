@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}作业详情 - CodeMate{% endblock %}
+
+{% block header_title %}作业详情{% endblock %}
+{% block header_subtitle %}完成编程任务{% endblock %}
+
+{% block head %}
+<style>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .assignment-meta {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #64748b;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .assignment-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .assignment-description {
+            font-size: 15px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .code-editor {
+            position: relative;
+        }
+
+        .code-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e1e;
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .code-toolbar .language {
+            color: #858585;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .code-toolbar .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .code-toolbar .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #ccc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .code-toolbar .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        textarea.code-input {
+            width: 100%;
+            min-height: 350px;
+            padding: 16px;
+            border: none;
+            border-radius: 0 0 12px 12px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #252526;
+            color: #d4d4d4;
+            resize: vertical;
+            outline: none;
+            tab-size: 4;
+        }
+
+        textarea.code-input::placeholder {
+            color: #666;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .output {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output.stdout {
+            color: #16a34a;
+            border-left: 4px solid #16a34a;
+        }
+
+        .output.stderr {
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+
+        .image-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .feedback-box {
+            background: #dbeafe;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 4px solid #1d4ed8;
+        }
+
+        .feedback-box strong {
+            color: #1e40af;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .status-submitted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-scored {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-not-submitted {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            
+
+            
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+        
+        </div>
+
+        {% if submission %}
+            {% if submission.score %}
+                <span class="status-badge status-scored">已批改</span>
+            {% else %}
+                <span class="status-badge status-submitted">已提交</span>
+            {% endif %}
+        {% else %}
+            <span class="status-badge status-not-submitted">未提交</span>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">作业描述</h3>
+            </div>
+            <p class="assignment-description">{{ assignment.description or '暂无描述' }}</p>
+            <div class="assignment-meta">
+                <span>
+                    <strong>所属班级:</strong> 
+                    {% if assignment.class_id %}
+                        {{ class_map.get(assignment.class_id, '未知班级') }}
+                    {% else %}
+                        所有班级
+                    {% endif %}
+                </span>
+                <span><strong>截止时间:</strong> {{ assignment.get_deadline_str() }}</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">代码编辑器</h3>
+            </div>
+            <div class="code-editor">
+                <div class="code-toolbar">
+                    <span class="language">Python</span>
+                    <div class="actions">
+                        <button class="action-btn" onclick="clearCode()">清空</button>
+                    </div>
+                </div>
+                <textarea id="code-input" class="code-input" placeholder="在此输入Python代码">{{ submission.code if submission else '' }}</textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="runCode()">运行代码</button>
+                {% if assignment.is_past_deadline() %}
+                <button class="btn btn-primary" disabled style="background-color: #94a3b8; cursor: not-allowed;" title="已过截止时间，无法提交">已截止</button>
+                {% else %}
+                <button class="btn btn-primary" onclick="submitAssignment()">提交作业</button>
+                {% endif %}
+                <a href="/student" class="btn btn-outline">返回列表</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">运行结果</h3>
+            </div>
+            <div id="output-container">
+                {% if submission %}
+                    {% if submission.stdout %}
+                        <div class="output stdout"><strong>标准输出:</strong><br>{{ submission.stdout }}</div>
+                    {% endif %}
+                    {% if submission.stderr %}
+                        <div class="output stderr"><strong>错误输出:</strong><br>{{ submission.stderr }}</div>
+                    {% endif %}
+                    {% if images %}
+                        <div style="margin-top: 15px; font-weight: 600; color: #1e293b;">生成的图片:</div>
+                        {% for img in images %}
+                        <div class="image-container">
+                            <img src="{{ img }}" alt="输出图片">
+                            <a href="{{ img }}" download class="download-btn">下载图片</a>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        {% if submission and submission.score %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">评分结果</h3>
+            </div>
+            <p class="score-display">得分: {{ submission.score }} 分</p>
+            {% if submission.feedback %}
+            <div class="feedback-box">
+                <strong>教师反馈:</strong><br>{{ submission.feedback }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+        function runCode() {
+            const code = document.getElementById('code-input').value;
+            const outputContainer = document.getElementById('output-container');
+
+            outputContainer.innerHTML = '<div class="loading show">正在运行代码...</div>';
+
+            fetch('/student/run_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                let output = '';
+                if (data.error) {
+                    output = '<div class="output stderr">' + data.error + '</div>';
+                } else {
+                    if (data.stdout) output += '<div class="output stdout"><strong>标准输出:</strong><br>' + data.stdout + '</div>';
+                    if (data.stderr) output += '<div class="output stderr"><strong>错误输出:</strong><br>' + data.stderr + '</div>';
+                    if (data.images && data.images.length > 0) {
+                        output += '<div style="margin-top: 15px; font-weight: 600; color: #1e293b;">生成的图片:</div>';
+                        data.images.forEach(img => {
+                            const filename = img.split('/').pop();
+                            output += '<div class="image-container">';
+                            output += '<img src="' + img + '" alt="运行结果图片">';
+                            output += '<a href="' + img + '" download="' + filename + '" class="download-btn">下载图片</a>';
+                            output += '</div>';
+                        });
+                    }
+                }
+                outputContainer.innerHTML = output;
+            })
+            .catch(err => {
+                outputContainer.innerHTML = '<div class="output stderr">请求失败: ' + err.message + '</div>';
+            });
+        }
+
+        function submitAssignment() {
+            const code = document.getElementById('code-input').value;
+
+            if (!code.trim()) {
+                alert('请输入代码');
+                return;
+            }
+
+            if (!confirm('确定要提交这份作业吗？提交后可以再次修改。')) {
+                return;
+            }
+
+            fetch('/student/submit_assignment/{{ assignment.id }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    let output = '';
+                    if (data.stdout) output += '<div class="output stdout"><strong>标准输出:</strong><br>' + data.stdout + '</div>';
+                    if (data.stderr) output += '<div class="output stderr"><strong>错误输出:</strong><br>' + data.stderr + '</div>';
+                    if (data.images && data.images.length > 0) {
+                        output += '<div style="margin-top: 15px; font-weight: 600; color: #1e293b;">生成的图片:</div>';
+                        data.images.forEach(img => {
+                            const filename = img.split('/').pop();
+                            output += '<div class="image-container">';
+                            output += '<img src="' + img + '" alt="运行结果图片">';
+                            output += '<a href="' + img + '" download="' + filename + '" class="download-btn">下载图片</a>';
+                            output += '</div>';
+                        });
+                    }
+                    document.getElementById('output-container').innerHTML = output;
+                    alert('作业提交成功！');
+                    location.reload();
+                } else {
+                    alert('提交失败: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('提交失败: ' + err.message);
+            });
+        }
+
+        function clearCode() {
+            document.getElementById('code-input').value = '';
+        }
+    </script>
+</body>
+</html>

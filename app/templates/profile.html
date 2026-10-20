@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - CodeMate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding-left: 46px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 20px;
+            max-width: 700px;
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(22, 163, 74, 0.1);
+            color: var(--success);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger);
+            display: block;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 40px;
+            margin: 0 auto 25px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 100;
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">AI</div>
+                <div class="logo-text">CodeMate</div>
+            </div>
+            <div class="sidebar-subtitle">{{ user.role == 'teacher' and '教师端' or '学生端' }}</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            {% if user.role == 'teacher' %}
+                <a href="/teacher" class="nav-item">
+                    <span>仪表盘</span>
+                </a>
+                <a href="/teacher/classes" class="nav-item">
+                    <span>班级管理</span>
+                </a>
+                <a href="/teacher/assignments" class="nav-item">
+                    <span>作业管理</span>
+                </a>
+                <a href="/teacher/students" class="nav-item">
+                    <span>学生管理</span>
+                </a>
+                <a href="/teacher/submissions" class="nav-item">
+                    <span>作业提交</span>
+                </a>
+            {% else %}
+                <a href="/student" class="nav-item">
+                    <span>作业列表</span>
+                </a>
+            {% endif %}
+            {% if user.role != 'teacher' %}
+                <a href="/chat" class="nav-item">
+                    <span>AI助手</span>
+                </a>
+            {% endif %}
+            <a href="/profile" class="nav-item active">
+                <span>个人资料</span>
+            </a>
+            <a href="/logout" class="nav-item" style="margin-top: auto;">
+                <span>退出登录</span>
+            </a>
+        </nav>
+    </div>
+
+    <main class="main-content">
+        <div class="header">
+            <div class="welcome">
+                <h1 class="welcome-title">个人资料</h1>
+                <p class="welcome-subtitle">管理您的账户信息</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">{{ user.display_name[0] }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">账户信息</h3>
+            </div>
+
+            <div class="profile-avatar">{{ user.display_name[0] }}</div>
+
+            <form method="post" id="profileForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" value="{{ user.username }}" disabled>
+                    <div class="hint">用户名用于登录，不可修改</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="display_name">显示名称/姓名</label>
+                    <input type="text" id="display_name" name="display_name" value="{{ user.display_name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password">新密码</label>
+                    <input type="password" id="new_password" name="new_password" placeholder="留空则不修改密码">
+                    <div class="hint">如需修改密码，请输入新密码</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">保存修改</button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('profileForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const message = document.getElementById('message');
+
+            try {
+                const res = await fetch('/profile', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (res.ok) {
+                    message.textContent = '修改成功！';
+                    message.className = 'message success';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 3000);
+                } else {
+                    message.textContent = '修改失败，请重试';
+                    message.className = 'message error';
+                }
+            } catch (err) {
+                message.textContent = '修改失败: ' + err.message;
+                message.className = 'message error';
+            }
+        };
+    </script>
+</body>
+</html>
