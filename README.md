@@ -237,4 +237,4 @@ python manage_users.py add 用户名 显示名 密码 role
 
 ## License
 
-未指定开源许可。如需公开发布，建议补充 LICENSE 文件（如 MIT）。
+本项目基于 [MIT License](LICENSE) 开源。
