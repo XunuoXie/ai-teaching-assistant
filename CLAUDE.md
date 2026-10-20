@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is an **AI Agent tutoring system** (AI 辅导系统) — a programming education platform where students write and execute Python code with AI guidance, teachers manage classes/assignments/grading, and admins handle user management.
+This is an **AI teaching assistant** (AI 助教平台) — a teacher-facing platform for programming coursework. Teachers create classes, publish assignments, review submissions and track who has not submitted; students write and execute Python code with AI guidance; an LLM grades submissions automatically; admins handle user management.
+
+This is **not an online judge**: there are no test cases and no deterministic verdicts. Grading is performed by an LLM in `app/utils/auto_grader.py`, which evaluates requirement coverage, correctness, code quality and generated figures.
 
 ### Tech Stack
 - **Backend**: Flask + SQLAlchemy + SQLite (dev) + JWT auth + python-dotenv
@@ -70,7 +72,7 @@ cd frontend && npm run dev                   # Start Vite dev server (default :3
 cd frontend && npm run build                 # Build SPA to frontend/dist/
 
 # Database & Users
-python init_db_with_users.py                 # Initialize DB with 4 default accounts
+python init_db_with_users.py                 # Create tables + 3 demo accounts (teacher/student/admin)
 python manage_users.py                       # List all users
 python manage_users.py reset <user> <pass>   # Reset password
 python manage_users.py add <user> <name> <pass> [role]  # Add user
@@ -117,6 +119,8 @@ app/                          # Flask backend
 │   ├── code_executor.py      # Sandboxed Python code execution with matplotlib/GIF support
 │   ├── decorators.py         # Session auth decorator (require_role)
 │   ├── llm.py                # LLM API caller (OpenAI-compatible, with curl fallback)
+│   ├── auto_grader.py        # LLM auto grading (precheck → task type → weighted tier score)
+│   ├── auto_assign.py        # Assigns new students to the default teacher's default class
 │   └── security.py           # Code security scanner (block dangerous imports/keywords)
 ├── templates/                 # Jinja2 templates (legacy rendering path)
 frontend/                     # Vue 3 SPA
@@ -147,9 +151,9 @@ static/
 ## Important Notes
 
 - **No tests directory** currently exists — no test framework is configured
-- The `app.old.py` at the repo root is a legacy single-file version, not actively used
+- `app.old.py` is excluded via `.gitignore` — a local-only legacy single-file version, not in the remote repo
 - Code execution sandbox (`sandbox_temp/`) is created at runtime and cleaned up after each execution
-- The app auto-creates 4 demo users on first launch (admin, teacher, student1, student2) — see `app/__init__.py:create_app()`
+- Two demo-account sets exist: `create_app()` seeds 4 users (admin, teacher, student1, student2) only when `User.query.count() == 0`; `init_db_with_users.py` seeds 3 users (teacher, student, admin). Whichever runs first determines the final account set
 - The `is_safe_code()` check in `security.py` is regex-based and blocks dangerous operations, but is not a full sandbox — the subprocess isolation is the real security boundary
 - Frontend key dependencies: `marked` (Markdown rendering in AI chat replies), `highlight.js` (Python code syntax highlighting in chat), `@element-plus/icons-vue` (all icons globally registered in main.js)
 - The vite config uses `loadEnv(mode, projectRoot, '')` to read the root `.env` file — prefix filtering is disabled so both `VITE_*` and `FLASK_*` vars are available

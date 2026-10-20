@@ -219,13 +219,26 @@ cd frontend && npm run dev
 
 ## 默认账号
 
-由 `init_db_with_users.py` 创建，**仅用于本地开发**：
+**仅用于本地开发，请勿用于生产环境。** 项目存在两套初始化逻辑，账号集合取决于先执行了哪一个。
+
+执行 `python init_db_with_users.py`（推荐，见「快速开始」第 3 步）时创建：
 
 | 角色 | 用户名 | 密码 |
 | --- | --- | --- |
 | 教师 | teacher | teacher123 |
 | 学生 | student | student123 |
 | 管理员 | admin | admin123 |
+
+若跳过该脚本直接启动，`create_app()` 会在用户表为空时自动创建另一套：
+
+| 角色 | 用户名 | 密码 |
+| --- | --- | --- |
+| 管理员 | admin | admin123 |
+| 教师 | teacher | teacher123 |
+| 学生 | student1 | student123 |
+| 学生 | student2 | student123 |
+
+两套逻辑互斥，先执行的决定最终账号集合。
 
 修改密码：
 
